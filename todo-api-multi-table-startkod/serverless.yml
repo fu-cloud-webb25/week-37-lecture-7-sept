@@ -1,0 +1,121 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: jespernyberg
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: todo-api-example
+
+provider:
+    name: aws
+    runtime: nodejs24.x
+    architecture: arm64
+    region: eu-north-1
+    iam:
+        role: ${file(./config.yml):role}
+
+functions:
+    ## Todos
+    getTodos:
+        handler: functions/todos/getTodos/index.handler
+        events:
+            - httpApi:
+                  path: /api/todos
+                  method: GET
+    addNewTodo:
+        handler: functions/todos/addNewTodo/index.handler
+        events:
+            - httpApi:
+                  path: /api/lists/{listId}/todos
+                  method: POST
+
+    updateTodoStatus:
+        handler: functions/todos/updateTodoStatus/index.handler
+        events:
+            - httpApi:
+                  path: /api/lists/{listId}/todos/{todoId}
+                  method: PATCH
+
+    deleteTodo:
+        handler: functions/todos/deleteTodo/index.handler
+        events:
+            - httpApi:
+                  path: /api/lists/{listId}/todos/{todoId}
+                  method: DELETE
+
+    ## Users
+    register:
+        handler: functions/auth/register/index.handler
+        events:
+            - httpApi:
+                  path: /api/auth/register
+                  method: POST
+    login:
+        handler: functions/auth/login/index.handler
+        events:
+            - httpApi:
+                  path: /api/auth/login
+                  method: POST
+
+    ## Lists
+    getLists:
+        handler: functions/lists/getLists/index.handler
+        events:
+            - httpApi:
+                  path: /api/lists
+                  method: GET
+    getListById:
+        handler: functions/lists/getListById/index.handler
+        events:
+            - httpApi:
+                  path: /api/lists/{listId}
+                  method: GET
+    createList:
+        handler: functions/lists/createList/index.handler
+        events:
+            - httpApi:
+                  path: /api/lists
+                  method: POST
+
+resources:
+    Resources:
+        UsersTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: todo-users
+                BillingMode: PAY_PER_REQUEST
+                AttributeDefinitions:
+                    - AttributeName: username
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: username
+                      KeyType: HASH
+
+        ListsTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: todo-lists
+                BillingMode: PAY_PER_REQUEST
+                AttributeDefinitions:
+                    - AttributeName: username
+                      AttributeType: S
+                    - AttributeName: id
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: username
+                      KeyType: HASH
+                    - AttributeName: id
+                      KeyType: RANGE
+
+        TodosTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: todo-todos
+                BillingMode: PAY_PER_REQUEST
+                AttributeDefinitions:
+                    - AttributeName: listId
+                      AttributeType: S
+                    - AttributeName: id
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: listId
+                      KeyType: HASH
+                    - AttributeName: id
+                      KeyType: RANGE
