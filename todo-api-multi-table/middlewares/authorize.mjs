@@ -12,6 +12,7 @@ export const authorizeOwnership = () => ({
         if(!list) {
             throw new createError(404, 'List not found');
         }
+        console.log('LIST & USERNAME', list);
 
         if(list.username !== username) {
             throw new createError(403, 'Unauthorized');

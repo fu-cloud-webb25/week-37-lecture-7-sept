@@ -44,6 +44,7 @@ export const addTodo = async (todo) => {
             TableName : 'todo-todos', 
             Item : todo 
         });
+        console.log(todo);
 
         await db.send(command);
         return true;

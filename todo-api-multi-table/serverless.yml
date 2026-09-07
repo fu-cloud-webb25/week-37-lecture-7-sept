@@ -25,7 +25,6 @@ functions:
             - httpApi:
                   path: /api/lists/{listId}/todos
                   method: POST
-
     updateTodoStatus:
         handler: functions/todos/updateTodoStatus/index.handler
         events:
@@ -73,3 +72,49 @@ functions:
             - httpApi:
                   path: /api/lists
                   method: POST
+
+resources:
+    Resources:
+        UsersTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: todo-users
+                BillingMode: PAY_PER_REQUEST
+                AttributeDefinitions:
+                    - AttributeName: username
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: username
+                      KeyType: HASH
+
+        ListsTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: todo-lists
+                BillingMode: PAY_PER_REQUEST
+                AttributeDefinitions:
+                    - AttributeName: username
+                      AttributeType: S
+                    - AttributeName: listId
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: username
+                      KeyType: HASH
+                    - AttributeName: listId
+                      KeyType: RANGE
+
+        TodosTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: todo-todos
+                BillingMode: PAY_PER_REQUEST
+                AttributeDefinitions:
+                    - AttributeName: listId
+                      AttributeType: S
+                    - AttributeName: todoId
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: listId
+                      KeyType: HASH
+                    - AttributeName: todoId
+                      KeyType: RANGE
