@@ -1,0 +1,44 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: jespernyberg
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: todo-api-example
+
+provider:
+    name: aws
+    runtime: nodejs24.x
+    architecture: arm64
+    region: eu-north-1
+    iam:
+        role: ${file(./config.yml):role}
+
+functions:
+    getTodos:
+        handler: functions/getTodos/index.handler
+        events:
+            - httpApi:
+                  path: /api/todos
+                  method: GET
+    getTodoById:
+        handler: functions/getTodoById/index.handler
+        events:
+            - httpApi:
+                  path: /api/todos/{id}
+                  method: GET
+    addNewTodo:
+        handler: functions/addNewTodo/index.handler
+        events:
+            - httpApi:
+                  path: /api/todos
+                  method: POST
+    updateTodoStatus:
+        handler: functions/updateTodoStatus/index.handler
+        events:
+            - httpApi:
+                  path: /api/todos/{id}
+                  method: PATCH
+    deleteTodo:
+        handler: functions/deleteTodo/index.handler
+        events:
+            - httpApi:
+                  path: /api/todos/{id}
+                  method: DELETE
