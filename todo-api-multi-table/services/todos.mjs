@@ -22,16 +22,33 @@ export const getTodos = async () => {
 
 export const getTodosByListId = async (listId) => {
     try {
-        
+        const command = new QueryCommand({
+            TableName : 'todo-todos',
+            KeyConditionExpression : 'listId = :listId',
+            ExpressionAttributeValues : {
+                ':listId' : listId
+            }
+        });
+
+        const { Items } = await db.send(command);
+        return Items;
     } catch(error) {
         console.log('ERROR:', error);
         throw createError(500, error.message);
     }
 }
 
-export const getTodo = async (listId, id) => {
+export const getTodo = async (listId, todoId) => {
     try {
-        
+        const command = new GetCommand({
+            TableName : 'todo-todos',
+            Key : { 
+                listId : listId, 
+                todoId : todoId 
+            }
+        });
+        const { Item } = await db.send(command);
+        return Item;
     } catch(error) {
         console.log('ERROR:', error);
         throw createError(500, error.message);
@@ -54,9 +71,9 @@ export const addTodo = async (todo) => {
     }
 }
 
-export const updateTodo = async (listId, id) => {
+export const updateTodo = async (listId, todoId) => {
     try {
-        const todo = await getTodo(listId, id);
+        const todo = await getTodo(listId, todoId);
         if(!todo) {
             return false;
         }
@@ -64,7 +81,7 @@ export const updateTodo = async (listId, id) => {
             TableName : 'todo-todos',
             Key : { 
                 listId : listId, 
-                id : id 
+                todoId : todoId 
             },
             UpdateExpression : 'SET done = :done',
             ExpressionAttributeValues : {
@@ -80,13 +97,13 @@ export const updateTodo = async (listId, id) => {
     }
 }
 
-export const deleteTodo = async (listId, id) => {
+export const deleteTodo = async (listId, todoId) => {
     try {
         const command = new DeleteCommand({
             TableName : 'todo-todos',
             Key : { 
                 listId : listId, 
-                id : id 
+                todoId : todoId
             }
         });
         await db.send(command);

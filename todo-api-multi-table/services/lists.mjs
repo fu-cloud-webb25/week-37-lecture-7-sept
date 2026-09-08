@@ -21,8 +21,13 @@ export const getLists = async (username) => {
     try {
         const command = new QueryCommand({
             TableName : 'todo-lists',
-            KeyConditionExpression : 'username'
+            KeyConditionExpression : 'username = :username',
+            ExpressionAttributeValues : {
+                ':username' : username
+            }
         });
+        const { Items } = await db.send(command);
+        return Items;
     } catch(error) {
         console.log('ERROR:', error);
         throw createError(500, error.message);
